@@ -1,134 +1,138 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<!DOCTYPE html>
 <html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.5">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
+  <meta charset="utf-8">
+  <title>Deliberate Suboptimal Chess AI</title>
+  <!-- Include chessboard.js CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/chessboard-1.0.0.min.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #board {
+      width: 400px;
+      margin-bottom: 10px;
+    }
+    #status {
+      margin-top: 10px;
+    }
+    /* For highlighting possible moves on hover */
+    .highlight {
+      background-color: yellow;
+    }
   </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="utf-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Deliberate Suboptimal Chess AI&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Include chessboard.js CSS --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/chessboard-1.0.0.min.css" /&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>font-family: Arial, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>#board {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>width: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>#status {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>margin-top: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>/* For highlighting possible moves on hover */</p>
-<p class="p1"><span class="Apple-converted-space">    </span>.highlight {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>background-color: yellow;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;h1&gt;Deliberate Suboptimal Chess AI Game&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="board"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;div id="status"&gt;&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;!-- Include chess.js and chessboard.js from CDN --&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0/chess.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/chessboard-1.0.0.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>/**********************************************</p>
-<p class="p1"><span class="Apple-converted-space">     </span>* Game Logic and Adaptive Suboptimal AI System</p>
-<p class="p1"><span class="Apple-converted-space">     </span>**********************************************/</p>
-<p class="p1"><span class="Apple-converted-space">    </span>var game = new Chess();</p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Adaptive parameter: higher playerSkill forces the AI to become more suboptimal</p>
-<p class="p1"><span class="Apple-converted-space">    </span>var playerSkill = 0;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Update player skill based on move quality (here, a capture increases the rating)</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function updatePlayerSkill(move) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if(move.flags.includes('c')) { // 'c' flag means a capture</p>
-<p class="p1"><span class="Apple-converted-space">          </span>playerSkill += 0.1;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>playerSkill = Math.max(playerSkill - 0.05, 0);</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Basic material values used for evaluation</p>
-<p class="p1"><span class="Apple-converted-space">    </span>var pieceValues = {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>p: 1,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>n: 3,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>b: 3,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>r: 5,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>q: 9,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>k: 0</p>
-<p class="p1"><span class="Apple-converted-space">    </span>};</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Evaluate position from White’s viewpoint; positive means White ahead.</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function evaluatePosition(chess) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>var board = chess.board();</p>
-<p class="p1"><span class="Apple-converted-space">      </span>var evaluation = 0;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>board.forEach(function(row) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>row.forEach(function(piece) {</p>
-<p class="p1"><span class="Apple-converted-space">          </span>if (piece) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>var value = pieceValues[piece.type] || 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Add if white, subtract if black</p>
-<p class="p1"><span class="Apple-converted-space">            </span>evaluation += (piece.color === 'w' ? value : -value);</p>
-<p class="p1"><span class="Apple-converted-space">          </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p1"><span class="Apple-converted-space">      </span>return evaluation;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// Utility to clone the current game state</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function cloneGame(chess) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>return new Chess(chess.fen());</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>// AI Move Selection:</p>
-<p class="p1"><span class="Apple-converted-space">    </span>//<span class="Apple-converted-space">  </span>• Generates legal moves and simulates them.</p>
-<p class="p1"><span class="Apple-converted-space">    </span>//<span class="Apple-converted-space">  </span>• Computes a material-based evaluation (from Black’s perspective).</p>
-<p class="p1"><span class="Apple-converted-space">    </span>//<span class="Apple-converted-space">  </span>• Determines a suboptimal “error margin” (which grows with the game phase and playerSkill).</p>
-<p class="p1"><span class="Apple-converted-space">    </span>//<span class="Apple-converted-space">  </span>• Occasionally favors moves that involve a subtle sacrifice.</p>
-<p class="p1"><span class="Apple-converted-space">    </span>function selectAIMove() {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>var moves = game.moves({ verbose: true });</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (moves.length === 0) return null; // no legal moves available</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// Determine game phase based on move count</p>
-<p class="p1"><span class="Apple-converted-space">      </span>var moveCount = game.history().length;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>var phase; // "opening", "midgame", "endgame"</p>
-<p class="p1"><span class="Apple-converted-space">      </span>if (moveCount &lt; 10) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>phase = "opening";</p>
-<p class="p1"><span class="Apple-converted-space">      </span>} else if (moveCount &lt; 30) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>phase = "midgame";</p>
-<p class="p1"><span class="Apple-converted-space">      </span>} else {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>phase = "endgame";</p>
-<p class="p1"><span class="Apple-converted-space">      </span>}</p>
-<p class="p2"><span class="Apple-converted-space">      </span></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// Evaluate each legal move.</p>
-<p class="p1"><span class="Apple-converted-space">      </span>// Since the evaluation function gives White’s advantage,</p>
-<p class="p1"><span class="Apple-converted-space">      </span>// we take its negative so that a higher score means a better move for Black.</p>
-<p class="p1"><span class="Apple-converted-space">      </span>var movesEvaluations = moves.map(function(move) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>var cloned = cloneGame(game);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>cloned.move(move);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>var evalScore = -evaluatePosition(cloned); // Higher is better for Black.</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return { move: move, score: evalScore };</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// Sort moves so that the best move (for Black) is first.</p>
-<p class="p1"><span class="Apple-converted-space">      </span>movesEvaluations.sort(function(a, b) {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>return b.score - a.score;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>});</p>
-<p class="p1"><span class="Apple-converted-space">      </span>var bestScore = movesEvaluations[0].score;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>// Define a base error margin that increases</p>
-</body>
-</html>
+  <h1>Deliberate Suboptimal Chess AI Game</h1>
+  <div id="board"></div>
+  <div id="status"></div>
+
+  <!-- Include chess.js and chessboard.js from CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/1.0.0/chess.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/chessboard-1.0.0.min.js"></script>
+  <script>
+    /**********************************************
+     * Game Logic and Adaptive Suboptimal AI System
+     **********************************************/
+    var game = new Chess();
+    var playerSkill = 0; // Adaptive parameter
+
+    function updatePlayerSkill(move) {
+      if(move.flags.includes('c')) { // Capture increases skill rating
+          playerSkill += 0.1;
+      } else {
+          playerSkill = Math.max(playerSkill - 0.05, 0);
+      }
+    }
+
+    // Basic material values for evaluation
+    var pieceValues = {
+      p: 1,
+      n: 3,
+      b: 3,
+      r: 5,
+      q: 9,
+      k: 0
+    };
+
+    function evaluatePosition(chess) {
+      var board = chess.board();
+      var evaluation = 0;
+      board.forEach(function(row) {
+        row.forEach(function(piece) {
+          if (piece) {
+            var value = pieceValues[piece.type] || 0;
+            evaluation += (piece.color === 'w' ? value : -value);
+          }
+        });
+      });
+      return evaluation;
+    }
+
+    function cloneGame(chess) {
+      return new Chess(chess.fen());
+    }
+
+    function selectAIMove() {
+      var moves = game.moves({ verbose: true });
+      if (moves.length === 0) return null;
+
+      var moveCount = game.history().length;
+      var phase;
+      if (moveCount < 10) {
+        phase = "opening";
+      } else if (moveCount < 30) {
+        phase = "midgame";
+      } else {
+        phase = "endgame";
+      }
+      
+      var movesEvaluations = moves.map(function(move) {
+        var cloned = cloneGame(game);
+        cloned.move(move);
+        var evalScore = -evaluatePosition(cloned); // Higher is better for Black.
+        return { move: move, score: evalScore };
+      });
+
+      movesEvaluations.sort(function(a, b) {
+        return b.score - a.score;
+      });
+      var bestScore = movesEvaluations[0].score;
+
+      var baseError = 0.5;
+      if (phase === "midgame") {
+         baseError += 0.3;
+      } else if (phase === "endgame") {
+         baseError += 0.6;
+      }
+      var errorMargin = baseError + playerSkill * 0.5; 
+
+      var candidateMoves = movesEvaluations.filter(function(entry) {
+        return (bestScore - entry.score) <= errorMargin;
+      });
+
+      var sacrificeCandidates = movesEvaluations.filter(function(entry) {
+         return entry.move.flags.includes('c') && entry.move.piece !== 'q';
+      });
+      if (sacrificeCandidates.length > 0 && Math.random() < 0.15) {
+         candidateMoves = sacrificeCandidates;
+      }
+
+      var selected = candidateMoves[Math.floor(Math.random() * candidateMoves.length)];
+      return selected.move;
+    }
+
+    /**********************************************
+     * UI Using chessboard.js (with Basic Highlighting)
+     **********************************************/
+    var config = {
+      draggable: true,
+      position: 'start',
+      pieceTheme: 'https://cdnjs.cloudflare.com/ajax/libs/chessboard.js/1.0.0/img/chesspieces/wikipedia/{piece}.png', // Loads chess piece images
+      onDragStart: function(source, piece, position, orientation) {
+        if (game.game_over() || piece.search(/^b/) !== -1) {
+          return false;
+        }
+      },
+      onDrop: function
